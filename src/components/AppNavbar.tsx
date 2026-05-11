@@ -17,7 +17,7 @@ import Toolbar from '@mui/material/Toolbar'
 import Typography from '@mui/material/Typography'
 import useMediaQuery from '@mui/material/useMediaQuery'
 import { alpha, useTheme } from '@mui/material/styles'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { Link as RouterLink, useLocation } from 'react-router-dom'
 
 interface AppNavbarProps {
@@ -40,9 +40,9 @@ export default function AppNavbar({ onLogout }: AppNavbarProps) {
 
   const closeDrawer = useCallback(() => setDrawerOpen(false), [])
 
-  useEffect(() => {
-    if (isMdUp) setDrawerOpen(false)
-  }, [isMdUp])
+  if (isMdUp && drawerOpen) {
+    setDrawerOpen(false)
+  }
 
   const handleLogout = () => {
     closeDrawer()
@@ -183,7 +183,7 @@ export default function AppNavbar({ onLogout }: AppNavbarProps) {
       <Drawer
         id="app-nav-drawer"
         anchor="right"
-        open={drawerOpen}
+        open={drawerOpen && !isMdUp}
         onClose={closeDrawer}
         slotProps={{
           paper: {
@@ -220,7 +220,7 @@ export default function AppNavbar({ onLogout }: AppNavbarProps) {
                     </ListItemIcon>
                     <ListItemText
                       primary={link.label}
-                      primaryTypographyProps={{ fontWeight: 600, fontSize: '0.9375rem' }}
+                      slotProps={{ primary: { sx: { fontWeight: 600, fontSize: '0.9375rem' } } }}
                     />
                   </ListItemButton>
                 </ListItem>
@@ -239,7 +239,7 @@ export default function AppNavbar({ onLogout }: AppNavbarProps) {
                 </ListItemIcon>
                 <ListItemText
                   primary="Sair"
-                  primaryTypographyProps={{ fontWeight: 600, fontSize: '0.9375rem' }}
+                  slotProps={{ primary: { sx: { fontWeight: 600, fontSize: '0.9375rem' } } }}
                 />
               </ListItemButton>
             </ListItem>

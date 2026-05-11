@@ -1,0 +1,16 @@
+export const SIGNS_API_PREFIX = '/api/v1'
+
+export const MIN_CLIP_FRAMES = 1
+export const MANUAL_MIN_CLIP_FRAMES = 5
+export const MAX_CLIP_FRAMES = 720
+export const MIN_CLIP_DURATION_MS = 50
+export const MAX_CLIP_DURATION_MS = 120_000
+
+export const STILL_POSE_HOLD_MS = 1_500
+export const STILL_POSE_MOVEMENT_THRESHOLD = 0.022
+
+export const POST_FLUSH_COOLDOWN_MS = 400
+
+export const NO_HANDS_CONFIRM_MS = 420
+
+export const MAX_TRANSLATION_SEGMENT_DURATION_MS = 120_000

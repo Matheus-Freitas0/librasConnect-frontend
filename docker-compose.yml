@@ -1,0 +1,11 @@
+services:
+  librasconnect-frontend:
+    build: .
+    container_name: librasconnect-frontend
+    restart: unless-stopped
+    networks:
+      - nginx-proxy
+
+networks:
+  nginx-proxy:
+    external: true

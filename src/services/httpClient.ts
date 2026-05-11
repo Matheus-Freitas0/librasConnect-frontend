@@ -6,10 +6,8 @@ import axios, {
 } from 'axios'
 import { clearToken, getToken } from './tokenStorage'
 
-const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8080'
-
 const httpClient = axios.create({
-  baseURL: apiBaseUrl,
+  baseURL: import.meta.env.VITE_API_URL,
   headers: {
     'Content-Type': 'application/json',
   },

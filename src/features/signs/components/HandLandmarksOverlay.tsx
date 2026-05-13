@@ -79,8 +79,7 @@ export default function HandLandmarksOverlay({ videoElement, resultRef, active }
           drawHandLandmarksOnCanvas(
             ctx,
             r.landmarks[i].map((p) => [p.x, p.y, p.z ?? 0]),
-            vw,
-            vh,
+            videoElement,
           )
         }
       }

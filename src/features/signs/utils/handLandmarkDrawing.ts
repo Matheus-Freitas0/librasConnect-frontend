@@ -1,4 +1,5 @@
 import { HandLandmarker } from '@mediapipe/tasks-vision'
+import { normalizedToVideoElementPixel } from './videoDisplayMapping'
 
 function normalizeConnections(list: typeof HandLandmarker.HAND_CONNECTIONS): ReadonlyArray<readonly [number, number]> {
   return list.map((item): readonly [number, number] => {
@@ -24,10 +25,11 @@ function depthStyle(z: number, zMin: number, zMax: number) {
 export function drawHandLandmarksOnCanvas(
   ctx: CanvasRenderingContext2D,
   landmarks: ReadonlyArray<readonly number[]>,
-  width: number,
-  height: number,
+  video: HTMLVideoElement,
 ) {
-  if (landmarks.length < 21 || width <= 0 || height <= 0) {
+  const vw = video.clientWidth
+  const vh = video.clientHeight
+  if (landmarks.length < 21 || vw <= 0 || vh <= 0) {
     return
   }
 
@@ -37,9 +39,9 @@ export function drawHandLandmarksOnCanvas(
 
   const toXY = (idx: number) => {
     const p = landmarks[idx]
-    const x = Number(p[0] ?? 0)
-    const y = Number(p[1] ?? 0)
-    return [x * width, y * height] as const
+    const nx = Number(p[0] ?? 0)
+    const ny = Number(p[1] ?? 0)
+    return normalizedToVideoElementPixel(nx, ny, video)
   }
 
   ctx.lineCap = 'round'

@@ -23,6 +23,7 @@ import { submitTrainingSample } from '../api/signsApi'
 import { useManualSignRecorder } from '../capture/useManualSignRecorder'
 import BimanualBadge from '../components/BimanualBadge'
 import CameraFeed from '../components/CameraFeed'
+import SignCameraCard from '../components/SignCameraCard'
 import type { ClipPayload } from '../types'
 
 export interface TrainingPageProps {
@@ -177,85 +178,31 @@ export default function TrainingPage({ token: _token, onLogout }: TrainingPagePr
             overflow: { xs: 'visible', md: 'hidden' },
           }}
         >
-          <Paper
-            sx={{
-              ...signCardSx,
-              p: { xs: 1, sm: 1.5 },
-              minHeight: { xs: 'min(60dvh, 520px)', md: 0 },
-              flex: { md: 1 },
-              display: 'flex',
-              flexDirection: 'column',
-              overflow: { xs: 'visible', md: 'hidden' },
-            }}
-          >
-            <Box
-              sx={{
-                position: 'relative',
-                flex: { xs: 1, md: 1 },
-                minHeight: { xs: 'min(56dvh, 480px)', md: 0 },
-                display: 'flex',
-                flexDirection: 'column',
-              }}
-            >
-              {!cameraReady && (
-                <Skeleton
-                  variant="rectangular"
-                  animation="wave"
-                  sx={{
-                    position: 'absolute',
-                    inset: 0,
-                    zIndex: 2,
-                    height: '100%',
-                    borderRadius: 2,
-                    bgcolor: 'action.hover',
-                  }}
-                />
-              )}
-              <Box
-                sx={{
-                  flex: 1,
-                  minHeight: 0,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  opacity: cameraReady ? 1 : 0,
-                  transition: 'opacity 200ms ease-out',
-                }}
-              >
-                <CameraFeed
-                  disabled={false}
-                  onReady={handleVideoReady}
-                  resultRef={latestResultRef}
-                  showHandLandmarks={cameraReady}
-                  fillHeight
-                  showHeadPositionGuide
-                />
-              </Box>
-              {isRecording && (
-                <Box
-                  sx={{
-                    position: 'absolute',
-                    inset: 0,
-                    border: '3px solid',
-                    borderColor: 'primary.main',
-                    borderRadius: 2,
-                    pointerEvents: 'none',
-                    zIndex: 3,
-                  }}
-                />
-              )}
-            </Box>
-
-            {isRecording && (
-              <LinearProgress
-                variant="determinate"
-                value={recordingProgress * 100}
-                color="primary"
-                sx={{ borderRadius: 2, height: 5, mt: 1, flexShrink: 0 }}
+          <SignCameraCard
+            cameraReady={cameraReady}
+            isRecording={isRecording}
+            video={
+              <CameraFeed
+                disabled={false}
+                onReady={handleVideoReady}
+                resultRef={latestResultRef}
+                showHandLandmarks={cameraReady}
+                fillHeight
+                showHeadPositionGuide
               />
-            )}
-
-            <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap', pt: 1, flexShrink: 0 }}>
-              {!cameraReady ? (
+            }
+            belowVideo={
+              isRecording ? (
+                <LinearProgress
+                  variant="determinate"
+                  value={recordingProgress * 100}
+                  color="primary"
+                  sx={{ borderRadius: 2, height: 5, mt: 1, flexShrink: 0 }}
+                />
+              ) : undefined
+            }
+            footer={
+              !cameraReady ? (
                 <Skeleton
                   variant="rounded"
                   animation="wave"
@@ -272,9 +219,9 @@ export default function TrainingPage({ token: _token, onLogout }: TrainingPagePr
                     </Typography>
                   )}
                 </>
-              )}
-            </Stack>
-          </Paper>
+              )
+            }
+          />
 
           <Paper
             sx={{

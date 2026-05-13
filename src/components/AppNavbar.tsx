@@ -1,6 +1,7 @@
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined'
 import MenuIcon from '@mui/icons-material/Menu'
 import TranslateOutlinedIcon from '@mui/icons-material/TranslateOutlined'
+import MenuBookOutlinedIcon from '@mui/icons-material/MenuBookOutlined'
 import SchoolOutlinedIcon from '@mui/icons-material/SchoolOutlined'
 import AppBar from '@mui/material/AppBar'
 import Box from '@mui/material/Box'
@@ -27,6 +28,7 @@ interface AppNavbarProps {
 const NAV_LINKS = [
   { to: '/translator', label: 'Tradutor', icon: TranslateOutlinedIcon },
   { to: '/training', label: 'Treinar conversa', icon: SchoolOutlinedIcon },
+  { to: '/dicionario', label: 'Dicionário', icon: MenuBookOutlinedIcon },
 ] as const
 
 export default function AppNavbar({ onLogout }: AppNavbarProps) {
@@ -36,7 +38,11 @@ export default function AppNavbar({ onLogout }: AppNavbarProps) {
   const [drawerOpen, setDrawerOpen] = useState(false)
 
   const isActive = (to: string) =>
-    to === '/training' ? pathname.startsWith('/training') : pathname === to
+    to === '/training'
+      ? pathname.startsWith('/training')
+      : to === '/dicionario'
+        ? pathname.startsWith('/dicionario')
+        : pathname === to
 
   const closeDrawer = useCallback(() => setDrawerOpen(false), [])
 

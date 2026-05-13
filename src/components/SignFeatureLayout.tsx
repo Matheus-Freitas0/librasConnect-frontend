@@ -223,6 +223,7 @@ export default function SignFeatureLayout({
               sx={
                 fillViewport && viewportLocked
                   ? {
+                      width: '100%',
                       flex: 1,
                       minHeight: 0,
                       overflow: 'hidden',
@@ -231,11 +232,12 @@ export default function SignFeatureLayout({
                     }
                   : fillViewport && !viewportLocked
                     ? {
+                        width: '100%',
                         display: 'flex',
                         flexDirection: 'column',
                         overflow: 'visible',
                       }
-                    : {}
+                    : { width: '100%' }
               }
             >
               {children}

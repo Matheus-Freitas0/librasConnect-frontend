@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import LoginPage from './pages/LoginPage'
 import TranslatorPage from './pages/TranslatorPage'
+import DictionaryPage from './features/signs/pages/DictionaryPage'
 import TrainingPage from './features/signs/pages/TrainingPage'
 import { clearToken, getToken } from './services/tokenStorage'
 
@@ -34,6 +35,16 @@ function App() {
         element={
           token ? (
             <TrainingPage token={token} onLogout={handleLogout} />
+          ) : (
+            <Navigate to="/login" replace />
+          )
+        }
+      />
+      <Route
+        path="/dicionario"
+        element={
+          token ? (
+            <DictionaryPage token={token} onLogout={handleLogout} />
           ) : (
             <Navigate to="/login" replace />
           )

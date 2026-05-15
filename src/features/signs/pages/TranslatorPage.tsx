@@ -19,6 +19,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import SignFeatureLayout, { signCardSx } from '../../../components/SignFeatureLayout'
 import { recognizeClip } from '../api/signsApi'
 import { useLiveHandDetection } from '../capture/useLiveHandDetection'
+import { MAX_SIGN_SEGMENT_DURATION_MS } from '../constants'
 import { useManualSignRecorder } from '../capture/useManualSignRecorder'
 import BimanualBadge from '../components/BimanualBadge'
 import CameraFeed from '../components/CameraFeed'
@@ -107,7 +108,10 @@ export default function TranslatorPage({ token: _token, onLogout }: TranslatorPa
     start,
     stop,
     clearError,
-  } = useManualSignRecorder({ onSegmentReady: handleSegmentReady })
+  } = useManualSignRecorder({
+    onSegmentReady: handleSegmentReady,
+    maxSegmentDurationMs: MAX_SIGN_SEGMENT_DURATION_MS,
+  })
 
   const isSessionActive = phase !== 'idle'
   const { handCount: previewHandCount } = useLiveHandDetection(

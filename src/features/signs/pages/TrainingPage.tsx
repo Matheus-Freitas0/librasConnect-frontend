@@ -20,6 +20,7 @@ import axios from 'axios'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import SignFeatureLayout, { signCardSx } from '../../../components/SignFeatureLayout'
 import { submitTrainingSample } from '../api/signsApi'
+import { MAX_SIGN_SEGMENT_DURATION_MS } from '../constants'
 import { useManualSignRecorder } from '../capture/useManualSignRecorder'
 import BimanualBadge from '../components/BimanualBadge'
 import CameraFeed from '../components/CameraFeed'
@@ -59,7 +60,10 @@ export default function TrainingPage({ token: _token, onLogout }: TrainingPagePr
     start,
     stop,
     clearError,
-  } = useManualSignRecorder({ onSegmentReady: onClipReady })
+  } = useManualSignRecorder({
+    onSegmentReady: onClipReady,
+    maxSegmentDurationMs: MAX_SIGN_SEGMENT_DURATION_MS,
+  })
 
   useEffect(() => {
     if (!cameraReady) {

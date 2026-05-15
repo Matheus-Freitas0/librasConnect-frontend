@@ -1,5 +1,6 @@
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
+import useMediaQuery from '@mui/material/useMediaQuery'
 import { alpha, useTheme } from '@mui/material/styles'
 import { useEffect, useRef, useState } from 'react'
 
@@ -13,21 +14,30 @@ type EllipseLayout = {
   shoulderY: number
 }
 
-function ellipseFromLayoutAspect(ar: number): EllipseLayout {
+function ellipseFromLayoutAspect(ar: number, compact: boolean): EllipseLayout {
   if (ar > 1.2) {
-    return { cx: 50, cy: 45, rx: 12, ry: 18, irx: 15, iry: 10, shoulderY: 50 }
+    return compact
+      ? { cx: 50, cy: 45, rx: 9, ry: 13, irx: 11, iry: 8, shoulderY: 50 }
+      : { cx: 50, cy: 45, rx: 12, ry: 18, irx: 15, iry: 10, shoulderY: 50 }
   }
   if (ar > 0.92) {
-    return { cx: 50, cy: 45, rx: 12, ry: 18, irx: 15, iry: 10, shoulderY: 50 }
+    return compact
+      ? { cx: 50, cy: 45, rx: 9, ry: 13, irx: 11, iry: 8, shoulderY: 50 }
+      : { cx: 50, cy: 45, rx: 12, ry: 18, irx: 15, iry: 10, shoulderY: 50 }
   }
   if (ar > 0.62) {
-    return { cx: 50, cy: 45, rx: 18, ry: 30, irx: 15, iry: 10, shoulderY: 50 }
+    return compact
+      ? { cx: 50, cy: 45, rx: 13, ry: 21, irx: 11, iry: 8, shoulderY: 50 }
+      : { cx: 50, cy: 45, rx: 18, ry: 30, irx: 15, iry: 10, shoulderY: 50 }
   }
-  return { cx: 50, cy: 45, rx: 20, ry: 30, irx: 15, iry: 10, shoulderY: 50 }
+  return compact
+    ? { cx: 50, cy: 45, rx: 14, ry: 22, irx: 11, iry: 8, shoulderY: 50 }
+    : { cx: 50, cy: 45, rx: 20, ry: 30, irx: 15, iry: 10, shoulderY: 50 }
 }
 
 export default function HeadPositionGuide() {
   const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'), { noSsr: true })
   const rootRef = useRef<HTMLDivElement>(null)
   const [layoutAspect, setLayoutAspect] = useState(1)
   const stroke = alpha(theme.palette.primary.main, 0.5)
@@ -45,7 +55,7 @@ export default function HeadPositionGuide() {
     return () => ro.disconnect()
   }, [])
 
-  const g = ellipseFromLayoutAspect(layoutAspect)
+  const g = ellipseFromLayoutAspect(layoutAspect, isMobile)
 
   return (
     <Box

@@ -26,37 +26,50 @@ export function useLiveHandDetection(
 
     let rafId: number | null = null
     let cancelled = false
+    let inFlight = false
 
-    const tick = async () => {
-      if (cancelled) {
-        return
-      }
-      const video = videoRef.current
-      if (video && isVideoFrameRenderable(video)) {
-        try {
-          const result = await detectHandsFromVideo(video, performance.now())
-          if (!cancelled) {
-            latestResultRef.current = result
-            setHandCount(result?.landmarks?.length ?? 0)
-          }
-        } catch {
-          latestResultRef.current = null
-          setHandCount(0)
-        }
-      } else if (!cancelled) {
-        latestResultRef.current = null
-        setHandCount(0)
-      }
+    const schedule = () => {
       if (!cancelled) {
-        rafId = window.requestAnimationFrame(() => {
-          void tick()
-        })
+        rafId = window.requestAnimationFrame(loop)
       }
     }
 
-    rafId = window.requestAnimationFrame(() => {
-      void tick()
-    })
+    const loop = () => {
+      schedule()
+
+      if (inFlight) {
+        return
+      }
+
+      const video = videoRef.current
+      if (!video || !isVideoFrameRenderable(video)) {
+        latestResultRef.current = null
+        setHandCount((prev) => (prev === 0 ? prev : 0))
+        return
+      }
+
+      inFlight = true
+      void detectHandsFromVideo(video, performance.now())
+        .then((result) => {
+          if (cancelled) {
+            return
+          }
+          latestResultRef.current = result
+          const count = result?.landmarks?.length ?? 0
+          setHandCount((prev) => (prev === count ? prev : count))
+        })
+        .catch(() => {
+          if (!cancelled) {
+            latestResultRef.current = null
+            setHandCount((prev) => (prev === 0 ? prev : 0))
+          }
+        })
+        .finally(() => {
+          inFlight = false
+        })
+    }
+
+    schedule()
 
     return () => {
       cancelled = true

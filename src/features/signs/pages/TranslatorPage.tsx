@@ -1,5 +1,3 @@
-import PauseCircleOutlinedIcon from '@mui/icons-material/PauseCircleOutlined'
-import PlayCircleOutlinedIcon from '@mui/icons-material/PlayCircleOutlined'
 import RecordVoiceOverIcon from '@mui/icons-material/RecordVoiceOver'
 import RefreshIcon from '@mui/icons-material/Refresh'
 import Alert from '@mui/material/Alert'
@@ -7,7 +5,6 @@ import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Chip from '@mui/material/Chip'
 import Divider from '@mui/material/Divider'
-import LinearProgress from '@mui/material/LinearProgress'
 import Paper from '@mui/material/Paper'
 import Skeleton from '@mui/material/Skeleton'
 import Snackbar from '@mui/material/Snackbar'
@@ -18,7 +15,6 @@ import axios from 'axios'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import SignFeatureLayout, { signCardSx } from '../../../components/SignFeatureLayout'
 import { recognizeClip } from '../api/signsApi'
-import { useLiveHandDetection } from '../capture/useLiveHandDetection'
 import { MAX_SIGN_SEGMENT_DURATION_MS } from '../constants'
 import { useManualSignRecorder } from '../capture/useManualSignRecorder'
 import BimanualBadge from '../components/BimanualBadge'
@@ -101,8 +97,6 @@ export default function TranslatorPage({ token: _token, onLogout }: TranslatorPa
   const {
     phase,
     handCount,
-    recordingElapsedMs,
-    recordingProgress,
     errorMessage,
     latestResultRef,
     start,
@@ -113,36 +107,20 @@ export default function TranslatorPage({ token: _token, onLogout }: TranslatorPa
     maxSegmentDurationMs: MAX_SIGN_SEGMENT_DURATION_MS,
   })
 
-  const isSessionActive = phase !== 'idle'
-  const { handCount: previewHandCount } = useLiveHandDetection(
-    videoRef,
-    cameraReady && !isSessionActive,
-  )
-  const badgeHandCount = isSessionActive ? handCount : previewHandCount
-
   useEffect(() => {
+    if (!cameraReady) {
+      return
+    }
+    start(videoRef)
     return () => {
       stop()
     }
-  }, [stop])
+  }, [cameraReady, start, stop])
 
   const handleVideoReady = useCallback((video: HTMLVideoElement) => {
     videoRef.current = video
     setCameraReady(true)
   }, [])
-
-  const handleStart = () => {
-    if (!cameraReady) {
-      return
-    }
-    setNetworkError(null)
-    setNotRecognizedHint(null)
-    start(videoRef)
-  }
-
-  const handleStop = () => {
-    stop()
-  }
 
   const handleClear = () => {
     setConversationText('')
@@ -158,10 +136,10 @@ export default function TranslatorPage({ token: _token, onLogout }: TranslatorPa
   const hasConversation = Boolean(conversationText.trim())
   const isRecording = phase === 'recording'
 
-  let statusLabel = 'Pronto para iniciar'
-  if (isSessionActive) {
+  let statusLabel = 'Aguardando câmera…'
+  if (cameraReady) {
     if (isRecording) {
-      statusLabel = `Gravando… retire as mãos (${(recordingElapsedMs / 1000).toFixed(1)}s)`
+      statusLabel = 'Gravando… retire as mãos'
     } else if (handCount === 0) {
       statusLabel = 'Mostre as mãos e faça o sinal.'
     } else {
@@ -178,8 +156,8 @@ export default function TranslatorPage({ token: _token, onLogout }: TranslatorPa
         titleHighlight="de conversa"
         description={
           <>
-            Com a sessão iniciada, o sistema <strong>grava enquanto vê suas mãos</strong>. Ao{' '}
-            <strong>retirar as mãos do quadro</strong>, o gesto é enviado para reconhecimento.
+            O sistema <strong>grava enquanto vê suas mãos</strong>. Ao <strong>retirar as mãos do quadro</strong>, o
+            gesto é enviado para reconhecimento e o texto entra na conversa.
           </>
         }
       >
@@ -194,95 +172,35 @@ export default function TranslatorPage({ token: _token, onLogout }: TranslatorPa
           }}
         >
           <Paper sx={{ ...signCardSx, p: { xs: 1.5, sm: 2 }, flexShrink: 0 }}>
-            <Stack spacing={1.5}>
-              <Stack
-                direction={{ xs: 'column', sm: 'row' }}
-                spacing={1.5}
+            <Stack
+              direction="row"
+              spacing={1}
+              sx={{
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                justifyContent: { xs: 'flex-start', sm: 'space-between' },
+                gap: 1,
+              }}
+            >
+              <Chip
+                size="small"
+                color={cameraReady ? 'primary' : 'default'}
+                variant={cameraReady ? 'filled' : 'outlined'}
+                label={statusLabel}
                 sx={{
-                  alignItems: { xs: 'stretch', sm: 'center' },
-                  justifyContent: 'space-between',
-                  gap: 1.5,
+                  maxWidth: '100%',
+                  height: 'auto',
+                  py: 0.5,
+                  '& .MuiChip-label': { whiteSpace: 'normal', fontSize: { xs: '0.8125rem', sm: '0.75rem' } },
                 }}
-              >
-                <Box sx={{ width: { xs: '100%', sm: 'auto' } }}>
-                  {!isSessionActive ? (
-                    <Button
-                      variant="contained"
-                      size="large"
-                      fullWidth
-                      sx={{
-                        maxWidth: { sm: 280 },
-                        py: { xs: 1.25, md: 1.5 },
-                        minHeight: { xs: 52, md: 54 },
-                        fontSize: { xs: '0.9375rem', md: '1rem' },
-                      }}
-                      startIcon={<PlayCircleOutlinedIcon />}
-                      onClick={handleStart}
-                      disabled={!cameraReady}
-                    >
-                      Iniciar
-                    </Button>
-                  ) : (
-                    <Button
-                      variant="outlined"
-                      color="primary"
-                      size="large"
-                      fullWidth
-                      sx={{
-                        maxWidth: { sm: 280 },
-                        py: { xs: 1.125, md: 1.35 },
-                        minHeight: { xs: 50, md: 52 },
-                      }}
-                      startIcon={<PauseCircleOutlinedIcon />}
-                      onClick={handleStop}
-                    >
-                      Encerrar sessão
-                    </Button>
-                  )}
-                </Box>
-                <Stack
-                  direction="row"
-                  spacing={1}
-                  sx={{
-                    alignItems: 'center',
-                    flexWrap: 'wrap',
-                    justifyContent: { xs: 'flex-start', sm: 'flex-end' },
-                    flex: { sm: 1 },
-                    minWidth: 0,
-                  }}
-                >
-                  <Chip
-                    size="small"
-                    color={isSessionActive ? 'primary' : 'default'}
-                    variant={isSessionActive ? 'filled' : 'outlined'}
-                    label={statusLabel}
-                    sx={{
-                      maxWidth: '100%',
-                      height: 'auto',
-                      py: 0.5,
-                      '& .MuiChip-label': { whiteSpace: 'normal', fontSize: { xs: '0.8125rem', sm: '0.75rem' } },
-                    }}
-                  />
-                  {pendingCount > 0 && (
-                    <Chip
-                      size="small"
-                      variant="outlined"
-                      label={`${pendingCount} reconhecendo…`}
-                      sx={{ '& .MuiChip-label': { fontSize: { xs: '0.8125rem', sm: '0.75rem' } } }}
-                    />
-                  )}
-                </Stack>
-              </Stack>
-              {isRecording && (
-                <LinearProgress
-                  variant="determinate"
-                  value={recordingProgress * 100}
-                  color="primary"
-                  sx={{ borderRadius: 2, height: 5 }}
+              />
+              {pendingCount > 0 && (
+                <Chip
+                  size="small"
+                  variant="outlined"
+                  label={`${pendingCount} reconhecendo…`}
+                  sx={{ '& .MuiChip-label': { fontSize: { xs: '0.8125rem', sm: '0.75rem' } } }}
                 />
-              )}
-              {pendingCount > 0 && !isRecording && (
-                <LinearProgress color="primary" sx={{ borderRadius: 2, height: 3 }} />
               )}
             </Stack>
           </Paper>
@@ -301,13 +219,12 @@ export default function TranslatorPage({ token: _token, onLogout }: TranslatorPa
           >
             <SignCameraCard
               cameraReady={cameraReady}
-              isRecording={isRecording}
               video={
                 <CameraFeed
                   disabled={false}
                   onReady={handleVideoReady}
                   resultRef={latestResultRef}
-                  showHandLandmarks={isSessionActive}
+                  showHandLandmarks={cameraReady && (handCount > 0 || isRecording)}
                   fillHeight
                   showHeadPositionGuide
                 />
@@ -323,7 +240,7 @@ export default function TranslatorPage({ token: _token, onLogout }: TranslatorPa
                   />
                 ) : (
                   <>
-                    <BimanualBadge handCount={badgeHandCount} />
+                    <BimanualBadge handCount={handCount} />
                     {isRecording && <Chip size="small" color="primary" variant="outlined" label="Gravando" />}
                   </>
                 )

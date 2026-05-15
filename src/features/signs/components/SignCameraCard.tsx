@@ -28,7 +28,6 @@ const videoStageSx: SxProps<Theme> = {
 
 interface SignCameraCardProps {
   cameraReady: boolean
-  isRecording: boolean
   video: ReactNode
   belowVideo?: ReactNode
   footer: ReactNode
@@ -36,7 +35,6 @@ interface SignCameraCardProps {
 
 export default function SignCameraCard({
   cameraReady,
-  isRecording,
   video,
   belowVideo,
   footer,
@@ -70,19 +68,6 @@ export default function SignCameraCard({
         >
           {video}
         </Box>
-        {isRecording && (
-          <Box
-            sx={{
-              position: 'absolute',
-              inset: 0,
-              border: '3px solid',
-              borderColor: 'primary.main',
-              borderRadius: 2,
-              pointerEvents: 'none',
-              zIndex: 3,
-            }}
-          />
-        )}
       </Box>
       {belowVideo}
       <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap', pt: 1, flexShrink: 0 }}>

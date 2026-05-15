@@ -8,7 +8,6 @@ import DialogContent from '@mui/material/DialogContent'
 import DialogContentText from '@mui/material/DialogContentText'
 import DialogTitle from '@mui/material/DialogTitle'
 import Divider from '@mui/material/Divider'
-import LinearProgress from '@mui/material/LinearProgress'
 import Paper from '@mui/material/Paper'
 import Skeleton from '@mui/material/Skeleton'
 import Snackbar from '@mui/material/Snackbar'
@@ -53,8 +52,6 @@ export default function TrainingPage({ token: _token, onLogout }: TrainingPagePr
   const {
     phase,
     handCount,
-    recordingElapsedMs,
-    recordingProgress,
     errorMessage,
     latestResultRef,
     start,
@@ -138,7 +135,7 @@ export default function TrainingPage({ token: _token, onLogout }: TrainingPagePr
   let statusBody = 'Aguardando câmera…'
   if (cameraReady) {
     if (isRecording) {
-      statusBody = `Gravando… retire as mãos (${(recordingElapsedMs / 1000).toFixed(1)}s)`
+      statusBody = 'Gravando… retire as mãos'
     } else if (handCount === 0) {
       statusBody = 'Mostre as mãos e faça o sinal.'
     } else {
@@ -184,7 +181,6 @@ export default function TrainingPage({ token: _token, onLogout }: TrainingPagePr
         >
           <SignCameraCard
             cameraReady={cameraReady}
-            isRecording={isRecording}
             video={
               <CameraFeed
                 disabled={false}
@@ -194,16 +190,6 @@ export default function TrainingPage({ token: _token, onLogout }: TrainingPagePr
                 fillHeight
                 showHeadPositionGuide
               />
-            }
-            belowVideo={
-              isRecording ? (
-                <LinearProgress
-                  variant="determinate"
-                  value={recordingProgress * 100}
-                  color="primary"
-                  sx={{ borderRadius: 2, height: 5, mt: 1, flexShrink: 0 }}
-                />
-              ) : undefined
             }
             footer={
               !cameraReady ? (
@@ -215,14 +201,7 @@ export default function TrainingPage({ token: _token, onLogout }: TrainingPagePr
                   sx={{ borderRadius: 999 }}
                 />
               ) : (
-                <>
-                  <BimanualBadge handCount={handCount} />
-                  {isRecording && (
-                    <Typography variant="body2" color="text.secondary" sx={{ fontVariantNumeric: 'tabular-nums' }}>
-                      {(recordingElapsedMs / 1000).toFixed(1)}s
-                    </Typography>
-                  )}
-                </>
+                <BimanualBadge handCount={handCount} />
               )
             }
           />

@@ -166,7 +166,7 @@ export default function TrainingPage({ token: _token, onLogout }: TrainingPagePr
         description={
           <>
             Faça o gesto com as mãos na câmera; ao <strong>retirar as mãos</strong>, a gravação é fechada e você informa o texto
-            da expressão. Use sempre o mesmo rótulo para a mesma expressão em LIBRAS.
+            da expressão.
           </>
         }
       >

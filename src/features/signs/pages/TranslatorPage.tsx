@@ -406,8 +406,8 @@ export default function TranslatorPage({ token: _token, onLogout }: TranslatorPa
                   variant="outlined"
                   placeholder={
                     cameraReady
-                      ? 'Digite e edite aqui. Expressões reconhecidas entram ao final; você pode apagar, mover o cursor e reescrever.'
-                      : 'Aguarde a câmera ou digite já; o texto fica editável o tempo todo.'
+                      ? 'Digite aqui. Expressões reconhecidas entram ao final do texto.'
+                      : 'Aguarde a câmera ou digite já.'
                   }
                   value={conversationText}
                   onChange={(e) => setConversationText(e.target.value)}

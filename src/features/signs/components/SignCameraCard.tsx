@@ -19,12 +19,11 @@ const signCameraCardPaperSx: SxProps<Theme> = {
 const videoStageSx: SxProps<Theme> = {
   position: 'relative',
   width: '100%',
-  minHeight: 0,
+  minHeight: { xs: 'min(78dvh, 680px)', sm: 'min(78dvh, 680px)', md: 0 },
+  maxHeight: { xs: 'min(84dvh, 820px)', sm: 'min(84dvh, 820px)', md: 'none' },
   display: 'flex',
   flexDirection: 'column',
-  flex: { xs: 'none', md: 1 },
-  aspectRatio: { xs: '4 / 3', md: 'auto' },
-  maxHeight: { xs: 'min(68dvh, 520px)', md: 'none' },
+  flex: { xs: 'none', sm: 'none', md: 1 },
 }
 
 interface SignCameraCardProps {

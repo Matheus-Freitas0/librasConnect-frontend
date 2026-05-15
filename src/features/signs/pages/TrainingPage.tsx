@@ -190,7 +190,7 @@ export default function TrainingPage({ token: _token, onLogout }: TrainingPagePr
                 disabled={false}
                 onReady={handleVideoReady}
                 resultRef={latestResultRef}
-                showHandLandmarks={cameraReady}
+                showHandLandmarks={cameraReady && (handCount > 0 || isRecording)}
                 fillHeight
                 showHeadPositionGuide
               />

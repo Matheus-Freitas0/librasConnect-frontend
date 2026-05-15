@@ -2,6 +2,7 @@ import type { HandLandmarkerResult } from '@mediapipe/tasks-vision'
 import type { MutableRefObject } from 'react'
 import { useEffect, useRef, useState } from 'react'
 import { detectHandsFromVideo, isVideoFrameRenderable } from './bimanualLandmarker'
+import { countConfidentHands, filterConfidentHandsResult } from './handDetection'
 
 export interface LiveHandDetectionResult {
   latestResultRef: MutableRefObject<HandLandmarkerResult | null>
@@ -50,12 +51,13 @@ export function useLiveHandDetection(
 
       inFlight = true
       void detectHandsFromVideo(video, performance.now())
-        .then((result) => {
+        .then((raw) => {
           if (cancelled) {
             return
           }
-          latestResultRef.current = result
-          const count = result?.landmarks?.length ?? 0
+          const result = filterConfidentHandsResult(raw)
+          const count = countConfidentHands(result)
+          latestResultRef.current = count > 0 ? result : null
           setHandCount((prev) => (prev === count ? prev : count))
         })
         .catch(() => {

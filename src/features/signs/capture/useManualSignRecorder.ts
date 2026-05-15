@@ -11,6 +11,11 @@ import {
 } from '../constants'
 import type { ClipPayload } from '../types'
 import { detectHandsFromVideo, isVideoFrameRenderable } from './bimanualLandmarker'
+import {
+  countConfidentHands,
+  filterConfidentHandsResult,
+  hasConfidentHands,
+} from './handDetection'
 import { framesFromRecording, type RecordedFrame } from './mapDetectionToClip'
 
 export type ManualSessionPhase = 'idle' | 'armed' | 'recording'
@@ -95,7 +100,9 @@ export function useManualSignRecorder(
 
       const nowInner = performance.now()
       const framesWithHand = records.filter((r) => r.result.landmarks.length >= 1).length
-      if (framesWithHand < minClipFrames) {
+      const enoughFrames =
+        framesWithHand >= minClipFrames || (reason === 'hands-gone' && framesWithHand >= 1)
+      if (!enoughFrames) {
         setErrorMessage('Gesto muito curto ou poucos frames com mão visível.')
         afterSegmentEnded(nowInner)
         return
@@ -121,17 +128,15 @@ export function useManualSignRecorder(
 
     if (video && isVideoFrameRenderable(video)) {
       try {
-        const result = await detectHandsFromVideo(video, nowInner)
+        const raw = await detectHandsFromVideo(video, nowInner)
         if (phaseRef.current !== 'armed' && phaseRef.current !== 'recording') {
           return
         }
-        latestResultRef.current = result
-        const hasHands = Boolean(result && result.landmarks.length >= 1)
-        if (hasHands && result) {
-          setHandCount(result.landmarks.length)
-        } else {
-          setHandCount(0)
-        }
+        const result = filterConfidentHandsResult(raw)
+        const confidentCount = countConfidentHands(result)
+        latestResultRef.current = confidentCount > 0 ? result : null
+        const hasHands = hasConfidentHands(result)
+        setHandCount(confidentCount)
 
         if (requireHandsClearBeforeNextRef.current && !hasHands) {
           requireHandsClearBeforeNextRef.current = false
@@ -145,7 +150,7 @@ export function useManualSignRecorder(
           hasHands &&
           result
 
-        if (mayStartSegment) {
+        if (mayStartSegment && result) {
           bufferRef.current = []
           recordingOriginRef.current = nowInner
           bufferRef.current.push({ t: 0, result })
@@ -155,7 +160,7 @@ export function useManualSignRecorder(
         } else if (phaseRef.current === 'recording' && recordingOriginRef.current > 0) {
           const origin = recordingOriginRef.current
           const t = nowInner - origin
-          const handsPresent = Boolean(result?.landmarks?.length)
+          const handsPresent = hasConfidentHands(result)
 
           if (handsPresent && result) {
             bufferRef.current.push({ t, result })
@@ -183,6 +188,9 @@ export function useManualSignRecorder(
         setRecordingElapsedMs(0)
         return
       }
+    } else {
+      latestResultRef.current = null
+      setHandCount(0)
     }
 
     if (phaseRef.current !== 'armed' && phaseRef.current !== 'recording') {

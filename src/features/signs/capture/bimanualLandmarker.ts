@@ -12,9 +12,9 @@ const WASM_PATHS = [
 const MODEL_PATH =
   'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task'
 
-const MIN_HAND_DETECTION_CONFIDENCE = 0.5
-const MIN_TRACKING_CONFIDENCE = 0.5
-const MIN_HAND_PRESENCE_CONFIDENCE = 0.5
+const MIN_HAND_DETECTION_CONFIDENCE = 0.6
+const MIN_TRACKING_CONFIDENCE = 0.6
+const MIN_HAND_PRESENCE_CONFIDENCE = 0.6
 
 let cachedVision: Awaited<ReturnType<typeof FilesetResolver.forVisionTasks>> | null = null
 let cachedLandmarker: HandLandmarker | null = null

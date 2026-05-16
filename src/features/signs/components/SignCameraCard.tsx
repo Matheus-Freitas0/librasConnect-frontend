@@ -9,11 +9,12 @@ import { signCardSx } from '../../../components/SignFeatureLayout'
 const signCameraCardPaperSx: SxProps<Theme> = {
   ...signCardSx,
   p: { xs: 1, sm: 1.5 },
-  flex: { md: 1 },
+  flex: 1,
+  minHeight: { md: 0 },
+  height: { md: '100%' },
   display: 'flex',
   flexDirection: 'column',
   overflow: { xs: 'visible', md: 'hidden' },
-  minHeight: { md: 0 },
 }
 
 const videoStageSx: SxProps<Theme> = {

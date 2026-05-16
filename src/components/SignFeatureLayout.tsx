@@ -20,6 +20,23 @@ export const signCardSx: SxProps<Theme> = {
       : '0 24px 48px -12px rgba(0, 0, 0, 0.45)',
 }
 
+export const signCaptureGridSx: SxProps<Theme> = {
+  flex: { xs: 'none', md: 1 },
+  minHeight: { xs: 'auto', md: 0 },
+  display: 'grid',
+  gridTemplateColumns: { xs: '1fr', md: 'minmax(0, 7fr) minmax(0, 5fr)' },
+  gridTemplateRows: { xs: 'auto auto', md: 'minmax(0, 1fr)' },
+  gap: { xs: 2, sm: 2 },
+  alignItems: 'stretch',
+  overflow: { xs: 'visible', md: 'hidden' },
+}
+
+export const signCaptureGridChildSx: SxProps<Theme> = {
+  minHeight: { xs: 'auto', md: 0 },
+  display: 'flex',
+  flexDirection: 'column',
+}
+
 interface SignFeatureLayoutProps {
   onLogout: () => void
   title: string

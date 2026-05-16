@@ -17,7 +17,11 @@ import Typography from '@mui/material/Typography'
 import type { Theme } from '@mui/material/styles'
 import axios from 'axios'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import SignFeatureLayout, { signCardSx } from '../../../components/SignFeatureLayout'
+import SignFeatureLayout, {
+  signCaptureGridChildSx,
+  signCaptureGridSx,
+  signCardSx,
+} from '../../../components/SignFeatureLayout'
 import { submitTrainingSample } from '../api/signsApi'
 import { MAX_SIGN_SEGMENT_DURATION_MS } from '../constants'
 import { useManualSignRecorder } from '../capture/useManualSignRecorder'
@@ -132,17 +136,6 @@ export default function TrainingPage({ token: _token, onLogout }: TrainingPagePr
 
   const isRecording = phase === 'recording'
 
-  let statusBody = 'Aguardando câmera…'
-  if (cameraReady) {
-    if (isRecording) {
-      statusBody = 'Gravando… retire as mãos'
-    } else if (handCount === 0) {
-      statusBody = 'Mostre as mãos e faça o sinal.'
-    } else {
-      statusBody = 'Afaste as mãos da câmera para concluir a amostra.'
-    }
-  }
-
   const dialogPaperSx = {
     borderRadius: 2,
     border: '1px solid',
@@ -167,19 +160,9 @@ export default function TrainingPage({ token: _token, onLogout }: TrainingPagePr
           </>
         }
       >
-        <Box
-          sx={{
-            flex: { xs: 'none', md: 1 },
-            minHeight: { xs: 'auto', md: 0 },
-            display: 'grid',
-            gridTemplateColumns: { xs: '1fr', md: 'minmax(0, 7fr) minmax(0, 5fr)' },
-            gridTemplateRows: { xs: 'auto auto', md: 'minmax(0, 1fr)' },
-            gap: { xs: 2, sm: 2 },
-            alignItems: 'stretch',
-            overflow: { xs: 'visible', md: 'hidden' },
-          }}
-        >
-          <SignCameraCard
+        <Box sx={signCaptureGridSx}>
+          <Box sx={signCaptureGridChildSx}>
+            <SignCameraCard
             cameraReady={cameraReady}
             video={
               <CameraFeed
@@ -205,13 +188,14 @@ export default function TrainingPage({ token: _token, onLogout }: TrainingPagePr
               )
             }
           />
+          </Box>
 
           <Paper
             sx={{
               ...signCardSx,
               p: { xs: 2.25, sm: 2.5 },
               minHeight: { xs: 'auto', md: 0 },
-              flex: { md: 1 },
+              flex: 1,
               display: 'flex',
               flexDirection: 'column',
               overflow: { xs: 'visible', md: 'hidden' },
@@ -224,16 +208,16 @@ export default function TrainingPage({ token: _token, onLogout }: TrainingPagePr
                 letterSpacing: -0.35,
                 fontSize: { xs: '1.1875rem', sm: '1.125rem' },
                 flexShrink: 0,
+                mb: 1.5,
               }}
             >
-              Status
+              Treinamento
             </Typography>
             <Box
               sx={{
-                flex: { md: 1 },
+                flex: 1,
                 minHeight: { xs: 'auto', md: 0 },
                 overflowY: { xs: 'visible', md: 'auto' },
-                pt: 1.5,
               }}
             >
               {!cameraReady ? (
@@ -241,21 +225,9 @@ export default function TrainingPage({ token: _token, onLogout }: TrainingPagePr
                   <Skeleton variant="text" width="92%" height={30} animation="wave" />
                   <Skeleton variant="text" width="70%" height={30} animation="wave" />
                   <Skeleton variant="rounded" height={80} animation="wave" sx={{ borderRadius: 2 }} />
-                  <Skeleton variant="text" width="55%" height={24} animation="wave" />
                 </Stack>
               ) : (
                 <>
-                  <Typography
-                    variant="body1"
-                    sx={{
-                      lineHeight: 1.65,
-                      color: 'text.primary',
-                      mb: 1.5,
-                      fontSize: { xs: '1.0625rem', sm: '1rem' },
-                    }}
-                  >
-                    {statusBody}
-                  </Typography>
                   <Typography
                     variant="body2"
                     color="text.secondary"

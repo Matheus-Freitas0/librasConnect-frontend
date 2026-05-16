@@ -13,7 +13,11 @@ import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 import axios from 'axios'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import SignFeatureLayout, { signCardSx } from '../../../components/SignFeatureLayout'
+import SignFeatureLayout, {
+  signCaptureGridChildSx,
+  signCaptureGridSx,
+  signCardSx,
+} from '../../../components/SignFeatureLayout'
 import { recognizeClip } from '../api/signsApi'
 import { MAX_SIGN_SEGMENT_DURATION_MS } from '../constants'
 import { useManualSignRecorder } from '../capture/useManualSignRecorder'
@@ -136,17 +140,6 @@ export default function TranslatorPage({ token: _token, onLogout }: TranslatorPa
   const hasConversation = Boolean(conversationText.trim())
   const isRecording = phase === 'recording'
 
-  let statusLabel = 'Aguardando câmera…'
-  if (cameraReady) {
-    if (isRecording) {
-      statusLabel = 'Gravando… retire as mãos'
-    } else if (handCount === 0) {
-      statusLabel = 'Mostre as mãos e faça o sinal.'
-    } else {
-      statusLabel = 'Afaste as mãos da câmera para enviar.'
-    }
-  }
-
   return (
     <>
       <SignFeatureLayout
@@ -161,62 +154,8 @@ export default function TranslatorPage({ token: _token, onLogout }: TranslatorPa
           </>
         }
       >
-        <Box
-          sx={{
-            flex: { xs: 'none', md: 1 },
-            minHeight: { xs: 'auto', md: 0 },
-            display: 'flex',
-            flexDirection: 'column',
-            overflow: { xs: 'visible', md: 'hidden' },
-            gap: { xs: 2, sm: 2 },
-          }}
-        >
-          <Paper sx={{ ...signCardSx, p: { xs: 1.5, sm: 2 }, flexShrink: 0 }}>
-            <Stack
-              direction="row"
-              spacing={1}
-              sx={{
-                alignItems: 'center',
-                flexWrap: 'wrap',
-                justifyContent: { xs: 'flex-start', sm: 'space-between' },
-                gap: 1,
-              }}
-            >
-              <Chip
-                size="small"
-                color={cameraReady ? 'primary' : 'default'}
-                variant={cameraReady ? 'filled' : 'outlined'}
-                label={statusLabel}
-                sx={{
-                  maxWidth: '100%',
-                  height: 'auto',
-                  py: 0.5,
-                  '& .MuiChip-label': { whiteSpace: 'normal', fontSize: { xs: '0.8125rem', sm: '0.75rem' } },
-                }}
-              />
-              {pendingCount > 0 && (
-                <Chip
-                  size="small"
-                  variant="outlined"
-                  label={`${pendingCount} reconhecendo…`}
-                  sx={{ '& .MuiChip-label': { fontSize: { xs: '0.8125rem', sm: '0.75rem' } } }}
-                />
-              )}
-            </Stack>
-          </Paper>
-
-          <Box
-            sx={{
-              flex: { xs: 'none', md: 1 },
-              minHeight: { xs: 'auto', md: 0 },
-              display: 'grid',
-              gridTemplateColumns: { xs: '1fr', md: 'minmax(0, 7fr) minmax(0, 5fr)' },
-              gridTemplateRows: { xs: 'auto auto', md: 'minmax(0, 1fr)' },
-              gap: { xs: 2, sm: 2 },
-              alignItems: 'stretch',
-              overflow: { xs: 'visible', md: 'hidden' },
-            }}
-          >
+        <Box sx={signCaptureGridSx}>
+          <Box sx={signCaptureGridChildSx}>
             <SignCameraCard
               cameraReady={cameraReady}
               video={
@@ -239,25 +178,23 @@ export default function TranslatorPage({ token: _token, onLogout }: TranslatorPa
                     sx={{ borderRadius: 999 }}
                   />
                 ) : (
-                  <>
-                    <BimanualBadge handCount={handCount} />
-                    {isRecording && <Chip size="small" color="primary" variant="outlined" label="Gravando" />}
-                  </>
+                  <BimanualBadge handCount={handCount} />
                 )
               }
             />
+          </Box>
 
-            <Paper
-              sx={{
-                ...signCardSx,
-                p: { xs: 2.25, sm: 2.5 },
-                minHeight: { xs: 'auto', md: 0 },
-                flex: { md: 1 },
-                display: 'flex',
-                flexDirection: 'column',
-                overflow: { xs: 'visible', md: 'hidden' },
-              }}
-            >
+          <Paper
+            sx={{
+              ...signCardSx,
+              p: { xs: 2.25, sm: 2.5 },
+              minHeight: { xs: 'auto', md: 0 },
+              flex: 1,
+              display: 'flex',
+              flexDirection: 'column',
+              overflow: { xs: 'visible', md: 'hidden' },
+            }}
+          >
               <Stack spacing={1.5} sx={{ flexShrink: 0 }}>
                 <Stack
                   direction={{ xs: 'column', sm: 'row' }}
@@ -268,16 +205,26 @@ export default function TranslatorPage({ token: _token, onLogout }: TranslatorPa
                     gap: 1,
                   }}
                 >
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      fontWeight: 700,
-                      letterSpacing: -0.35,
-                      fontSize: { xs: '1.1875rem', sm: '1.125rem' },
-                    }}
-                  >
-                    Conversa
-                  </Typography>
+                  <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap', gap: 1 }}>
+                    <Typography
+                      variant="h6"
+                      sx={{
+                        fontWeight: 700,
+                        letterSpacing: -0.35,
+                        fontSize: { xs: '1.1875rem', sm: '1.125rem' },
+                      }}
+                    >
+                      Conversa
+                    </Typography>
+                    {pendingCount > 0 && (
+                      <Chip
+                        size="small"
+                        variant="outlined"
+                        label={`${pendingCount} reconhecendo…`}
+                        sx={{ '& .MuiChip-label': { fontSize: { xs: '0.8125rem', sm: '0.75rem' } } }}
+                      />
+                    )}
+                  </Stack>
                   <Stack direction="row" spacing={0.5} sx={{ justifyContent: { xs: 'flex-start', sm: 'flex-end' } }}>
                     <Button
                       size="medium"
@@ -342,7 +289,6 @@ export default function TranslatorPage({ token: _token, onLogout }: TranslatorPa
                 />
               </Box>
             </Paper>
-          </Box>
         </Box>
       </SignFeatureLayout>
 

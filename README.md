@@ -114,6 +114,8 @@ npm run build
 
 Os artefatos ficam em `dist/`. Sirva com qualquer host estático ou integração ao seu pipeline; configure `VITE_API_URL` no ambiente de build para apontar à API de produção.
 
-## Licença
+## Licença e manutenção
 
-Projeto privado — uso conforme definido pelo mantenedor do repositório.
+Este repositório é mantido por **[Matheus Freitas](https://github.com/Matheus-Freitas0)** ([@Matheus-Freitas0](https://github.com/Matheus-Freitas0)).
+
+O código-fonte é de propriedade do mantenedor. Não há arquivo `LICENSE` na raiz do projeto — uso, cópia e distribuição fora do escopo autorizado pelo mantenedor não são permitidos sem permissão prévia.
